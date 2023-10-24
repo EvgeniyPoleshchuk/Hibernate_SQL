@@ -11,7 +11,7 @@ import java.io.Serializable;
 @Embeddable
 public class Contact  implements Serializable {
 
-    private String phone_number;
+    private int age;
     private String name;
     private String surname;
 }
