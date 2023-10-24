@@ -1,12 +1,13 @@
 package ru.netology.hibernate_sql.model;
 
 import jakarta.persistence.Embeddable;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.io.Serializable;
 
-@Data
+@Getter
+@Setter
+@ToString
 @NoArgsConstructor
 @Embeddable
 public class Contact  implements Serializable {
