@@ -6,7 +6,9 @@ import org.springframework.context.annotation.Configuration;
 
 
 import org.springframework.http.HttpMethod;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.User;
@@ -18,7 +20,8 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
-@EnableWebSecurity
+@EnableWebSecurity()
+@EnableMethodSecurity(securedEnabled = true,jsr250Enabled = true,prePostEnabled = true)
 public class SecurityConfiguration {
     @Bean
     public PasswordEncoder encoder() {
@@ -27,32 +30,36 @@ public class SecurityConfiguration {
 
     @Bean
     public UserDetailsService userDetailsService(PasswordEncoder encoder) {
-        UserDetails admin = User.withUsername("Petya")
+        UserDetails user1 = User.withUsername("Petya")
                 .password(encoder.encode("1233"))
-                .roles("Admin")
+                .roles("WRITE")
                 .build();
-        UserDetails user = User.withUsername("Grisha")
+        UserDetails user2 = User.withUsername("Grisha")
                 .password(encoder().encode("1234"))
-                .roles("Guest")
+                .roles("READ")
+                .build();
+        UserDetails user3 = User.withUsername("Misha")
+                .password(encoder().encode("12345"))
+                .authorities("DELETE")
                 .build();
 
-        return new InMemoryUserDetailsManager(admin,user);
+
+        return new InMemoryUserDetailsManager(user1,user2,user3);
     }
 
-    @Bean
-    public SecurityFilterChain FilterChain(HttpSecurity http) throws Exception {
-        return http.formLogin(Customizer.withDefaults())
-                .authorizeHttpRequests(auth -> auth.requestMatchers(HttpMethod.GET,"/persons/by-city")
-                        .hasRole("Admin")
-                        .requestMatchers(HttpMethod.GET,"/persons/by-age")
-                        .hasRole("Guest")
-                        .requestMatchers(HttpMethod.GET,"/persons/by-nameAndSurname")
-                        .permitAll()
-                        .anyRequest()
-                        .authenticated())
-                .build();
-
-    }
+//    @Bean
+//    public SecurityFilterChain FilterChain(HttpSecurity http) throws Exception {
+//        return http.formLogin(Customizer.withDefaults())
+//                .authorizeHttpRequests(auth -> auth.requestMatchers(HttpMethod.GET,"/persons/by-city")
+//                        .hasRole("ADMIN")
+//                        .requestMatchers(HttpMethod.GET,"/persons/by-age")
+//                        .hasRole("USER")
+//                        .requestMatchers(HttpMethod.GET,"/persons/by-nameAndSurname")
+//                        .permitAll()
+//                        .anyRequest()
+//                        .authenticated())
+//                .build();
+// }
 
 
 }
